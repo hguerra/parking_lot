@@ -1,0 +1,8 @@
+# secrets
+config/.ssh
+config/*.json
+config/*.tfvars
+
+# terraform
+.terraform
+*.tfstate

@@ -1,0 +1,59 @@
+version: "3.7"
+
+services:
+
+  backend:
+    image: containous/whoami
+    environment:
+      VIRTUAL_PORT: 80
+      VIRTUAL_HOST: *.whoami.localhost
+    networks:
+      - "internal"
+
+  proxy:
+    image: jwilder/nginx-proxy:alpine
+    restart: always
+    environment:
+      DEFAULT_HOST: <HOST>
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - "internal"
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+      - "/app/nginx/template/nginx.tmpl:/app/nginx.tmpl:ro"
+      - "/app/nginx/template/proxy.conf:/etc/nginx/proxy.conf:ro"
+      - "/app/nginx/logs/nginx:/var/log/nginx"
+      - "/app/nginx/credentials:/etc/nginx/htpasswd"
+      - "/app/nginx/conf:/etc/nginx/conf.d"
+      - "/app/nginx/vhost:/etc/nginx/vhost.d"
+      - "/app/nginx/dhparam:/etc/nginx/dhparam"
+      - "/app/nginx/html:/usr/share/nginx/html"
+      - "/app/nginx/certs:/etc/nginx/certs"
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion:v1.11
+    restart: always
+    container_name: letsencrypt
+    networks:
+      - "internal"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/app/nginx/template/nginx.tmpl:/app/nginx.tmpl:ro"
+      - "/app/nginx/template/proxy.conf:/etc/nginx/proxy.conf:ro"
+      - "/app/nginx/logs/nginx:/var/log/nginx"
+      - "/app/nginx/credentials:/etc/nginx/htpasswd"
+      - "/app/nginx/conf:/etc/nginx/conf.d"
+      - "/app/nginx/vhost:/etc/nginx/vhost.d"
+      - "/app/nginx/dhparam:/etc/nginx/dhparam"
+      - "/app/nginx/html:/usr/share/nginx/html"
+      - "/app/nginx/certs:/etc/nginx/certs:rw"
+    depends_on:
+      - "proxy"
+
+networks:
+  internal:
+    external: false
