@@ -1,3 +1,5 @@
+require 'api_constraints.rb'
+
 Rails.application.routes.draw do
   # For details on the DSL available within this file,
   # see http://guides.rubyonrails.org/routing.html
@@ -9,9 +11,10 @@ Rails.application.routes.draw do
   root to: 'application#not_found'
 
   # Api definition
-  namespace :api do
-    namespace :v1 do
-      resources :parking, only: [:create]
+  scope module: :api, defaults: {format: :json} do
+    scope module: :v1, constraints: ApiConstraints.new(version: 1, default: true) do
+      post 'parking'           => 'parking#create'
+      put 'parking/:id/pay' => 'parking#update'
     end
   end
 
