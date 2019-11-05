@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 0) do
+ActiveRecord::Schema.define(version: 2019_11_04_225117) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "parking", force: :cascade do |t|
+    t.string "plate", null: false
+    t.string "time"
+    t.boolean "paid", default: false, null: false
+    t.boolean "left", default: false, null: false
+    t.datetime "entry_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "left_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
 end
