@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   # Api definition
   namespace :api do
     namespace :v1 do
+      resources :parking, only: [:create]
     end
   end
 
