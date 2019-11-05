@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe Api::V1::ParkingController, type: :controller do
-  describe "POST #create" do
+  describe 'POST /parking #create' do
     context 'when is created' do
       before(:each) do
         @parking_attributes = attributes_for(:parking)
@@ -34,6 +34,37 @@ describe Api::V1::ParkingController, type: :controller do
         expect(json_response['error']).to_not be_nil
         expect(json_response['error']['status']).to eq 422
         expect(json_response['error']['message']).to_not be_nil
+      end
+    end
+  end
+
+  describe 'PUT /parking/:id/pay #update' do
+    context 'when is updated' do
+      before(:each) do
+        @parking = create(:parking)
+        put :update, params: {id: @parking.id}
+      end
+
+      it 'renders resource updated' do
+        expect(response).to have_http_status(:no_content)
+        expect(response.body).to eq ""
+      end
+
+      it 'modify the parking' do
+        actual_parking = Parking.find(@parking.id)
+        expect(actual_parking.paid).to be true
+      end
+    end
+
+    context 'when is not updated' do
+      before(:each) do
+        put :update, params: {id: 0}
+      end
+
+      it 'renders errors' do
+        expect(json_response['error']).to_not be_nil
+        expect(json_response['error']['status']).to eq 404
+        expect(json_response['error']['message']).to eq 'Registro não encontrado.'
       end
     end
   end
