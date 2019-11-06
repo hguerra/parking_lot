@@ -14,7 +14,7 @@ module Api
         end
 
         def not_found
-          render_error('Registro não encontrado.', :not_found)
+          render_error('Record not found.', :not_found)
         end
       end
     end

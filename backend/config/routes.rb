@@ -13,8 +13,9 @@ Rails.application.routes.draw do
   # Api definition
   scope module: :api, defaults: {format: :json} do
     scope module: :v1, constraints: ApiConstraints.new(version: 1, default: true) do
-      post 'parking'           => 'parking#create'
-      put 'parking/:id/pay' => 'parking#update'
+      post 'parking'        => 'parking#create'
+      put 'parking/:id/pay' => 'parking#pay'
+      put 'parking/:id/out' => 'parking#out'
     end
   end
 
