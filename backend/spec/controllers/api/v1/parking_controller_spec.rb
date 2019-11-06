@@ -45,24 +45,6 @@ describe Api::V1::ParkingController, type: :controller do
         expect(json_response['error']['message']).to_not be_nil
       end
     end
-
-    context 'when parameter is valid and plate already exists' do
-      it 'it shoud create resource at the first time' do
-        post :create, params: {parking: {plate: 'FAA-1234'}}
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(json_response['error']).to_not be_nil
-        expect(json_response['error']['status']).to eq 422
-        expect(json_response['error']['message']).to eq 'Plate not left.'
-      end
-
-      it 'renders errors becausa has a duplicate entry' do
-        post :create, params: {parking: {plate: 'FAA-1234'}}
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(json_response['error']).to_not be_nil
-        expect(json_response['error']['status']).to eq 422
-        expect(json_response['error']['message']).to eq 'Plate not left.'
-      end
-    end
   end
 
   describe 'PUT /parking/:id/pay #pay' do
