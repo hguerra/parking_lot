@@ -5,11 +5,15 @@ module Api
       before_action :set_parking_by_id, only: [:pay, :out]
 
       def create
-        parking = Parking.new(parking_params)
-        if parking.save
-          render json: parking, status: :created, serializer: Api::V1::ParkingCreateSerializer
+        if Parking.exists?(plate: params[:plate], left: false)
+          render_error('Plate not left.', :unprocessable_entity)
         else
-          render_error(parking.errors.full_messages[0], :unprocessable_entity)
+          parking = Parking.new(parking_params)
+          if parking.save
+            render json: parking, status: :created, serializer: Api::V1::ParkingCreateSerializer
+          else
+            render_error(parking.errors.full_messages[0], :unprocessable_entity)
+          end
         end
       end
 

@@ -30,7 +30,7 @@ describe Api::V1::ParkingController, type: :controller do
       end
     end
 
-    context 'when is not created' do
+    context 'when params not valid' do
       before(:each) do
         @parking_attributes = attributes_for(:parking)
         @parking_attributes[:plate] = "#{@parking_attributes[:plate]}0"
@@ -43,6 +43,24 @@ describe Api::V1::ParkingController, type: :controller do
         expect(json_response['error']).to_not be_nil
         expect(json_response['error']['status']).to eq 422
         expect(json_response['error']['message']).to_not be_nil
+      end
+    end
+
+    context 'when parameter is valid and plate already exists' do
+      it 'it shoud create resource at the first time' do
+        post :create, params: {parking: {plate: 'FAA-1234'}}
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(json_response['error']).to_not be_nil
+        expect(json_response['error']['status']).to eq 422
+        expect(json_response['error']['message']).to eq 'Plate not left.'
+      end
+
+      it 'renders errors becausa has a duplicate entry' do
+        post :create, params: {parking: {plate: 'FAA-1234'}}
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(json_response['error']).to_not be_nil
+        expect(json_response['error']['status']).to eq 422
+        expect(json_response['error']['message']).to eq 'Plate not left.'
       end
     end
   end
@@ -198,7 +216,7 @@ describe Api::V1::ParkingController, type: :controller do
         put :pay, params: {id: @parking_one.id}
         put :out, params: {id: @parking_one.id}
 
-        post :create, params: {parking:{plate: @parking_one.plate}}
+        post :create, params: {parking: {plate: @parking_one.plate}}
         get :history, params: {plate: @parking_one.plate}
       end
 
