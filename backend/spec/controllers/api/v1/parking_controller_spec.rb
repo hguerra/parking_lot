@@ -38,11 +38,11 @@ describe Api::V1::ParkingController, type: :controller do
     end
   end
 
-  describe 'PUT /parking/:id/pay #update' do
+  describe 'PUT /parking/:id/pay #pay' do
     context 'when is updated' do
       before(:each) do
         @parking = create(:parking)
-        put :update, params: {id: @parking.id}
+        put :pay, params: {id: @parking.id}
       end
 
       it 'renders resource updated' do
@@ -58,7 +58,7 @@ describe Api::V1::ParkingController, type: :controller do
 
     context 'when is not updated' do
       before(:each) do
-        put :update, params: {id: 0}
+        put :pay, params: {id: 0}
       end
 
       it 'renders errors' do

@@ -1,7 +1,7 @@
 module Api
   module V1
     class ParkingController < ApiController
-      before_action :set_parking, only: [:update]
+      before_action :set_parking, only: [:pay]
 
       def create
         parking = Parking.new(parking_params)
@@ -12,7 +12,7 @@ module Api
         end
       end
 
-      def update
+      def pay
         if @parking
           if @parking.update({paid: true})
             head :no_content
