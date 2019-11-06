@@ -1,7 +1,7 @@
 module Api
   module V1
     class ParkingController < ApiController
-      before_action :set_parking, only: [:pay]
+      before_action :set_parking, only: [:pay, :out]
 
       def create
         parking = Parking.new(parking_params)
@@ -18,6 +18,22 @@ module Api
             head :no_content
           else
             render_error(@parking.errors.full_messages[0], :unprocessable_entity)
+          end
+        else
+          render_error(@parking.errors.full_messages[0], :not_found)
+        end
+      end
+
+      def out
+        if @parking
+          if @parking.paid
+            if @parking.update({left: true, left_at: Time.now})
+              head :no_content
+            else
+              render_error(@parking.errors.full_messages[0], :unprocessable_entity)
+            end
+          else
+            render_error('Parking must be paid.', :unprocessable_entity)
           end
         else
           render_error(@parking.errors.full_messages[0], :not_found)
