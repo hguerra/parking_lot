@@ -1,6 +1,6 @@
 module Api
   module V1
-    class ParkingSerializer < ActiveModel::Serializer
+    class ParkingCreateSerializer < ActiveModel::Serializer
       attributes :id, :plate
     end
   end

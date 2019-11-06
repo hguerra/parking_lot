@@ -2,12 +2,12 @@ module Api
   module V1
     class ParkingController < ApiController
       include ActionView::Helpers::DateHelper
-      before_action :set_parking, only: [:pay, :out]
+      before_action :set_parking_by_id, only: [:pay, :out]
 
       def create
         parking = Parking.new(parking_params)
         if parking.save
-          render json: parking, status: :created
+          render json: parking, status: :created, serializer: Api::V1::ParkingCreateSerializer
         else
           render_error(parking.errors.full_messages[0], :unprocessable_entity)
         end
@@ -44,9 +44,18 @@ module Api
         end
       end
 
+      def history
+        parking = Parking.where(plate: params[:plate]).order(:id)
+        parking.each do |p|
+          p.time = distance_of_time_in_words(p.entry_at, Time.now) unless p.time
+        end
+
+        render json: parking, status: :ok, each_serializer: Api::V1::ParkingHistorySerializer
+      end
+
       private
 
-      def set_parking
+      def set_parking_by_id
         @parking = Parking.find(params[:id])
       end
 

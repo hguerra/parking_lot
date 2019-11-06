@@ -127,4 +127,93 @@ describe Api::V1::ParkingController, type: :controller do
       end
     end
   end
+
+  describe 'GET /parking/:plate #history' do
+    context 'when there are no records' do
+      before(:each) do
+        get :history, params: {plate: 'AAA-9999'}
+      end
+
+      it 'renders resource history' do
+        expect(response).to have_http_status(:ok)
+        expect(json_response).to_not be_nil
+        expect(json_response.length).to eq 0
+      end
+    end
+
+    context 'when there is only one record and not left' do
+      before(:each) do
+        @parking = create(:parking)
+        get :history, params: {plate: @parking.plate}
+      end
+
+      it 'renders resource history' do
+        expect(response).to have_http_status(:ok)
+        expect(json_response).to_not be_nil
+        expect(json_response.length).to eq 1
+      end
+
+      it 'vehicle not left' do
+        actual_parking = Parking.find(@parking.id)
+        expect(json_response[0]['id']).to eq actual_parking.id
+        expect(json_response[0]['plate']).to be_nil
+        expect(actual_parking.time).to be_nil
+        expect(json_response[0]['time']).to_not be_nil
+        expect(json_response[0]['paid']).to be false
+        expect(json_response[0]['left']).to be false
+        expect(json_response[0]['entry_at']).to be_nil
+        expect(json_response[0]['left_at']).to be_nil
+      end
+    end
+
+    context 'when there is only one record and left' do
+      before(:each) do
+        @parking = create(:parking)
+        put :pay, params: {id: @parking.id}
+        put :out, params: {id: @parking.id}
+        get :history, params: {plate: @parking.plate}
+      end
+
+      it 'renders resource history' do
+        expect(response).to have_http_status(:ok)
+        expect(json_response).to_not be_nil
+        expect(json_response.length).to eq 1
+      end
+
+      it 'vehicle left' do
+        actual_parking = Parking.find(@parking.id)
+        expect(json_response[0]['id']).to eq actual_parking.id
+        expect(json_response[0]['plate']).to be_nil
+        expect(json_response[0]['time']).to eq actual_parking.time
+        expect(json_response[0]['paid']).to be true
+        expect(json_response[0]['left']).to be true
+        expect(json_response[0]['entry_at']).to be_nil
+        expect(json_response[0]['left_at']).to be_nil
+      end
+    end
+
+    context 'when there are many records' do
+      before(:each) do
+        @parking_one = create(:parking)
+        put :pay, params: {id: @parking_one.id}
+        put :out, params: {id: @parking_one.id}
+
+        post :create, params: {parking:{plate: @parking_one.plate}}
+        get :history, params: {plate: @parking_one.plate}
+      end
+
+      it 'renders resource history' do
+        expect(response).to have_http_status(:ok)
+        expect(json_response).to_not be_nil
+        expect(json_response.length).to eq 2
+      end
+
+      it 'compare plates' do
+        expect(json_response[0]['id']).to_not be_nil
+        expect(json_response[1]['id']).to_not be_nil
+        expect(json_response[0]['left']).to be true
+        expect(json_response[1]['left']).to be false
+      end
+    end
+  end
 end

@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       post 'parking'        => 'parking#create'
       put 'parking/:id/pay' => 'parking#pay'
       put 'parking/:id/out' => 'parking#out'
+      get 'parking/:plate'  => 'parking#history'
     end
   end
 
