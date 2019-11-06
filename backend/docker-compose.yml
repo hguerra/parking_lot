@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+  postgres:
+    image: 'postgres:12'
+    environment:
+      POSTGRES_USER: parking_lot
+      POSTGRES_PASSWORD: parking_lot
+    volumes:
+      - 'postgres:/var/lib/postgresql/data'
+
+  app:
+    build: .
+    command: bash entrypoint.sh
+    depends_on:
+      - 'postgres'
+    environment:
+      DATABASE_USERNAME: parking_lot
+      DATABASE_PASSWORD: parking_lot
+    ports:
+      - '3000:3000'
+    volumes_from:
+      - box
+
+  box:
+    image: busybox
+    volumes:
+      - /box
+
+volumes:
+  postgres:
+  box:
