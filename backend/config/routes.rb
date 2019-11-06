@@ -11,6 +11,10 @@ Rails.application.routes.draw do
   # Api definition
   namespace :api do
     namespace :v1 do
+      post 'parking'        => 'parking#create'
+      put 'parking/:id/pay' => 'parking#pay'
+      put 'parking/:id/out' => 'parking#out'
+      get 'parking/:plate'  => 'parking#history'
     end
   end
 
