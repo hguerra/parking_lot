@@ -1,6 +1,7 @@
 module Api
   module V1
     class ParkingController < ApiController
+      include ActionView::Helpers::DateHelper
       before_action :set_parking, only: [:pay, :out]
 
       def create
@@ -27,7 +28,10 @@ module Api
       def out
         if @parking
           if @parking.paid
-            if @parking.update({left: true, left_at: Time.now})
+            left_at = Time.now
+            time = distance_of_time_in_words(@parking.entry_at, left_at)
+
+            if @parking.update({left: true, left_at: left_at, time: time})
               head :no_content
             else
               render_error(@parking.errors.full_messages[0], :unprocessable_entity)

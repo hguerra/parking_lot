@@ -97,6 +97,8 @@ describe Api::V1::ParkingController, type: :controller do
         expect(actual_parking.paid).to be true
         expect(actual_parking.left).to be true
         expect(actual_parking.left_at).to_not be_nil
+        expect(actual_parking.time).to_not be_nil
+        expect(actual_parking.time).to eq 'less than a minute'
       end
     end
 
